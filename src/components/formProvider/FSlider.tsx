@@ -11,7 +11,7 @@ interface ISlider extends PropsForm<number> {
 }
 const CustomSlider = styled(Slider)(({ theme }) => ({
   marginTop: 50,
-  color: theme.vars.palette.primary.main,
+  color: theme.palette.primary.main,
   height: 8,
   '& .MuiSlider-track': {
     border: 'none',
@@ -36,7 +36,7 @@ const CustomSlider = styled(Slider)(({ theme }) => ({
     width: 40,
     height: 40,
     borderRadius: '50% 50% 50% 0',
-    backgroundColor: theme.vars.palette.primary.dark,
+    backgroundColor: theme.palette.primary.dark,
     transformOrigin: 'bottom left',
     transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
     '&:before': { display: 'none' },
