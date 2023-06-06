@@ -30,7 +30,7 @@ Overall, Web book hotel represents a significant leap forward in travel booking 
 
 ## Diagram
 
-<img src="./Diagram-staymate.drawio.svg">
+<img src="https://github.com/tuan-dd/Stay-Mate-BE/blob/main/src/public/Diagram-staymate.drawio.svg">
 
 ### Authentication
 
