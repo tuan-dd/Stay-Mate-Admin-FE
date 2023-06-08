@@ -6,6 +6,7 @@ import apiService from '@/app/server';
 import { IResponse, IMembership } from '@/utils/interface';
 import { EPackage, EStatusRedux } from '@/utils/enum';
 import { fetchGetHotels } from '../hotel/hotel.slice';
+import { createToast } from '@/utils/utils';
 
 export interface IMembershipRedux {
   status: EStatusRedux;
@@ -44,6 +45,7 @@ export const membershipSlice = createSlice({
       state.status = EStatusRedux.succeeded;
 
       if (action.payload) state.memberships.unshift(action.payload);
+      createToast('Yea Yea earn money', 'success');
     });
     builder.addCase(fetchGetMembership.fulfilled, (state, action) => {
       state.status = EStatusRedux.succeeded;

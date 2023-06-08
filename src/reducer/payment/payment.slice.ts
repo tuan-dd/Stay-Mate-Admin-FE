@@ -5,6 +5,7 @@ import { createAppAsyncThunk, updateBalance } from '../user/user.slice';
 import apiService from '@/app/server';
 import { IResponse, IBookingRes } from '@/utils/interface';
 import { EStatusIBooking, EStatusRedux } from '@/utils/enum';
+import { createToast } from '@/utils/utils';
 
 export interface IBookingResCustom extends IBookingRes {
   errorMessage?: string;
@@ -17,6 +18,7 @@ export interface IPaymentRedux {
   bookings: IBookingResCustom[];
   errorMessage: string;
   errorMessageChargeOrWithdraw: string;
+  count: number;
   page: number;
 }
 
@@ -27,6 +29,7 @@ const initialState: IPaymentRedux = {
   bookings: [],
   errorMessage: '',
   errorMessageChargeOrWithdraw: '',
+  count: 0,
   page: 1,
 };
 
@@ -64,21 +67,23 @@ export const paymentSlice = createSlice({
 
     builder.addCase(fetchCharge.fulfilled, (state) => {
       state.status = EStatusRedux.succeeded;
+      createToast('Charge successfully', 'success');
     });
     builder.addCase(fetchWithdraw.fulfilled, (state) => {
       state.status = EStatusRedux.succeeded;
+      createToast('Withdraw successfully', 'success');
     });
     builder.addCase(fetchGetBookingsByHotelier.fulfilled, (state, action) => {
       state.status = EStatusRedux.succeeded;
       if (action.payload.data) {
         if (action.payload.page === 1) {
-          state.bookings = action.payload.data;
+          state.bookings = action.payload.data.bookings;
         } else {
-          state.bookings = [...state.bookings, ...action.payload.data];
+          state.bookings = [...state.bookings, ...action.payload.data.bookings];
         }
-
+        state.count = action.payload.data.count;
         state.page = action.payload.page;
-        state.statusPayment = action.payload.data[0].status as EStatusIBooking;
+        state.statusPayment = action.payload.data.bookings[0].status as EStatusIBooking;
       }
     });
 
@@ -95,12 +100,18 @@ export const paymentSlice = createSlice({
       state.status = EStatusRedux.error;
       if (state.statusPayment !== action.meta.arg.status) {
         state.bookings = [];
+        state.count = 0;
       }
       state.statusPayment = action.meta.arg.status;
       state.errorMessage = action.error.message || 'some thing wrong';
     });
   },
 });
+
+interface IResBookings {
+  bookings: IBookingRes[];
+  count: number;
+}
 
 export const fetchGetBookingsByHotelier = createAppAsyncThunk(
   'payment/fetchGetBookingByHotelier',
@@ -115,7 +126,7 @@ export const fetchGetBookingsByHotelier = createAppAsyncThunk(
     page: number;
     status: EStatusIBooking;
   }) => {
-    const response = await apiService.get<IResponse<IBookingRes[]>>(
+    const response = await apiService.get<IResponse<IResBookings>>(
       '/payment/hotelier/booking',
       {
         params: { allHotel, hotelId, page, status },

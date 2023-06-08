@@ -1,29 +1,10 @@
 import { Box, Card, Stack, Typography, Alert } from '@mui/material';
-
-import { useNavigate } from 'react-router-dom';
 import { urlImagesTrending } from '@/utils/images';
 import { fDate } from '@/utils/formatTime';
 
 import { IBookingResCustom } from './payment.slice';
 
 function CardBooking({ booking, i }: { booking: IBookingResCustom; i: number }) {
-  const navigate = useNavigate();
-
-  const objectParams = {
-    destination: booking.hotelId.hotelName,
-    country: booking.hotelId.country,
-    city: booking.hotelId.city,
-    startDate: fDate(undefined),
-    endDate: fDate(new Date().getTime() + 1000 * 60 * 60 * 24),
-    rooms: '1',
-    adults: '2',
-    children: '0',
-  };
-
-  const searchParams = `/hotel/${booking.hotelId._id}?${new URLSearchParams(
-    objectParams
-  ).toString()}`;
-
   return (
     <Card>
       <Stack flexDirection='row'>
@@ -38,16 +19,7 @@ function CardBooking({ booking, i }: { booking: IBookingResCustom; i: number }) 
         <Box padding={1.5} flexGrow={1}>
           <Stack flexDirection='row'>
             <Stack spacing={1} flexGrow={1} width='100%'>
-              <Typography
-                onClick={() => navigate(searchParams)}
-                textTransform='capitalize'
-                color='primary'
-                fontSize={18}
-                sx={{
-                  cursor: 'pointer',
-                  '&:hover': { textDecoration: 'underline' },
-                }}
-              >
+              <Typography textTransform='capitalize' color='primary' fontSize={18}>
                 {booking.hotelId.hotelName}
               </Typography>
               <Typography fontSize={14}>

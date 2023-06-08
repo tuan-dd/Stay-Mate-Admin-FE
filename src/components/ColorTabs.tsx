@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import Badge from '@mui/material/Badge';
 import { SxProps } from '@mui/material';
 import { IActions } from '@/utils/interface';
 
@@ -11,6 +12,7 @@ export default function ColorTabs({
   orientation,
   sx,
   sxTab,
+  numberBadge = [],
 }: {
   tabs: string[] | IActions[];
   handleChange: (event: React.SyntheticEvent, newValue: string) => void;
@@ -18,6 +20,7 @@ export default function ColorTabs({
   orientation: 'horizontal' | 'vertical';
   sx?: SxProps;
   sxTab?: SxProps;
+  numberBadge?: number[];
 }) {
   return (
     <>
@@ -30,7 +33,7 @@ export default function ColorTabs({
         aria-label='secondary tabs example'
         sx={{ ...sx }}
       >
-        {tabs.map((tab) => {
+        {tabs.map((tab, i) => {
           if (typeof tab === 'string')
             return (
               <Tab
@@ -46,7 +49,18 @@ export default function ColorTabs({
               key={tab.name}
               value={tab.name}
               label={tab.name}
-              icon={tab.icon}
+              icon={
+                <Badge
+                  color='success'
+                  badgeContent={numberBadge[i] || 0}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                  }}
+                >
+                  {tab.icon}
+                </Badge>
+              }
               iconPosition='start'
               sx={{ fontSize: 18, justifyContent: 'flex-start', ...sxTab }}
             />

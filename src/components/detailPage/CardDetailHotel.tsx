@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-
 import React from 'react';
 import { z } from 'zod';
 import IconClose from '../IconClose';
@@ -39,7 +38,7 @@ function CardDetailHotel({
 
   return (
     <>
-      <Card sx={{ width: '70vw', border: '1px solid black', position: 'relative' }}>
+      <Card sx={{ width: '85vw', border: '1px solid black', position: 'relative' }}>
         <Stack flexDirection='row'>
           <Box sx={{ width: 400 }}>
             <ImageList
@@ -95,6 +94,7 @@ function CardDetailHotel({
           </Button>
         </Box>
         <IconClose
+          sx={{ zIndex: 1 }}
           onClick={() =>
             dispatch(
               fetchUpdateDeleteHotel({

@@ -60,6 +60,7 @@ const setAllCookie = (
     secure: false,
     path: '/',
     sameSite: 'strict',
+    expires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7),
   };
   if (!isDelete) {
     Cookie.set('userId', props.userId, option);

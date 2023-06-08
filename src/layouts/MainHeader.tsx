@@ -35,7 +35,6 @@ function MainHeader() {
     }),
     shallowEqual
   );
-  const is2FA = useSelector((state: RootState) => state.auth.is2FA, shallowEqual);
 
   const { memberships, isExpire } = useSelector(
     (state: RootState) => ({
@@ -168,48 +167,53 @@ function MainHeader() {
 
           {/* box Menu and card */}
           <Stack sx={{ flexGrow: 0 }} flexDirection='row' gap={3} alignItems='center'>
-            {remainMemberShip ? (
-              <Stack flexDirection='row' alignItems='center'>
-                <Typography>
-                  Your membership remains:{' '}
-                  {remainMemberShip === 1
-                    ? `${remainMemberShip} day`
-                    : `${remainMemberShip} days`}
-                </Typography>
-              </Stack>
-            ) : (
-              <Button
-                sx={{ color: 'white' }}
-                onClick={() => setIsOpenModalPaymentMembership(true)}
-              >
-                Upgrade membership
-              </Button>
-            )}
             <IconButton sx={{ p: 0 }}>
               <Avatar alt={currentUser?.name} src={currentUser?.avatar} />
             </IconButton>
-            <Typography fontWeight={700} color='black'>
-              {Math.round(
-                ((currentUser?.account.balance as number) + Number.EPSILON) * 100
-              ) / 100 || 0}{' '}
-              $
-            </Typography>
-
-            <Typography fontWeight={700} color='black'>
-              {Math.round(
-                ((currentUser?.account.virtualBalance as number) + Number.EPSILON) * 100
-              ) / 100 || 0}{' '}
-              $
-            </Typography>
-            {is2FA && (
+            <Box width={100}>
+              <Typography textAlign='center'>Balance</Typography>
+              <Typography fontWeight={600} color='yellow' textAlign='center'>
+                {Math.round(
+                  ((currentUser?.account.balance as number) + Number.EPSILON) * 100
+                ) / 100 || 0}{' '}
+                $
+              </Typography>
+            </Box>
+            <Box width={100}>
+              <Typography textAlign='center'>Deposit</Typography>
+              <Typography fontWeight={600} color='yellow' textAlign='center'>
+                {Math.round(
+                  ((currentUser?.account.virtualBalance as number) + Number.EPSILON) * 100
+                ) / 100 || 0}{' '}
+                $
+              </Typography>
+            </Box>
+            <Stack alignItems='center' height={45}>
+              {remainMemberShip ? (
+                <Stack flexDirection='row' alignItems='center'>
+                  <Typography>
+                    Membership remains:{' '}
+                    {remainMemberShip === 1
+                      ? `${remainMemberShip} day`
+                      : `${remainMemberShip} days`}
+                  </Typography>
+                </Stack>
+              ) : (
+                <Button
+                  sx={{ color: 'white' }}
+                  onClick={() => setIsOpenModalPaymentMembership(true)}
+                >
+                  Upgrade membership
+                </Button>
+              )}
               <Button
                 color='warning'
-                sx={{ fontWeight: 700 }}
                 onClick={() => dispatch(fetchSignOut())}
+                sx={{ height: 30 }}
               >
                 Log out
               </Button>
-            )}
+            </Stack>
           </Stack>
         </Toolbar>
       </Container>
