@@ -121,7 +121,7 @@ function User() {
             preview: URL.createObjectURL(file),
           })
         );
-        if (file) {
+        if (urlFile) {
           setValue('avatar', urlFile);
         }
       }
