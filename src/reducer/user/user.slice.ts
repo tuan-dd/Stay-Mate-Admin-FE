@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import cloneDeep from 'lodash/cloneDeep';
+import { getDeleteFilter, TProsLodash, createToast } from '@utils/utils';
+import { ERole, EStatusRedux } from '@utils/enum';
 import apiService from '@/app/server';
 import { IHotel, IResponse, IRoom, IUser } from '@/utils/interface';
 import { setHeaders } from '@/utils/jwt';
 import { AppDispatch, RootState } from '@/app/store';
 import { setAuth, setIsInitialState } from '../auth/auth.slice';
-import { ERole, EStatusRedux } from '@/utils/enum';
-import { cloudinaryUpload } from '@/utils/cloudinary';
-import { getDeleteFilter, TProsLodash } from '@/utils/utils';
-
 /**
  * @getUser
  * @getHotel
@@ -90,11 +88,13 @@ export const userSlice = createSlice({
       if (action.payload.data) {
         state.currentUser = action.payload.data;
       }
+      createToast('You are already our member', 'success');
     });
     builder.addCase(fetchUpdateUser.fulfilled, (state, action) => {
       state.status = EStatusRedux.succeeded;
       const { name, avatar } = action.payload;
       if (state.currentUser) state.currentUser = { ...state.currentUser, name, avatar };
+      createToast('Update successfully', 'success');
     });
 
     builder.addCase(fetchUser.rejected, (state, action) => {
@@ -151,7 +151,7 @@ export const fetchCreateUser = createAppAsyncThunk(
 
 export interface IUpdateUser {
   name: string;
-  avatar?: string | any;
+  avatar?: string;
   password?: string;
   newPassword?: string;
   confirmPassword?: string;
@@ -160,10 +160,6 @@ export interface IUpdateUser {
 export const fetchUpdateUser = createAppAsyncThunk(
   'user/fetchUpdateUser',
   async (updateUser: IUpdateUser) => {
-    if (updateUser.avatar && typeof updateUser.avatar !== 'string') {
-      updateUser.avatar = await cloudinaryUpload(updateUser.avatar);
-    }
-
     await apiService.put<IResponse<IUser>>('/user/user-update', {
       ...updateUser,
     });

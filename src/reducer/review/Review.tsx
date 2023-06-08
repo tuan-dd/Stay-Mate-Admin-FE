@@ -61,7 +61,7 @@ function Review({ targetHotel }: { targetHotel: IHotel<IRoom[]> | null }) {
           index: indexRefReply.current,
         })
       );
-    } else {
+    } else if (!isReply) {
       dispatch(
         fetchCreateReply({
           hotelId: hotel.hotelId,

@@ -96,7 +96,7 @@ function CardReview({
               <Chip label='Customer review' color='info' />
               <Typography variant='body1'>{review.context}</Typography>
               <Typography textAlign='end' variant='body2' color='text.primary'>
-                {fToNow(review.createdAt)}
+                {fToNow(review.updatedAt)}
               </Typography>
             </Stack>
             <Divider />
@@ -110,7 +110,7 @@ function CardReview({
                     color='text.primary'
                     sx={{ position: 'absolute', bottom: 2, right: 4 }}
                   >
-                    {fToNow(review.reply.createdAt)}
+                    {fToNow(review.reply.updatedAt)}
                   </Typography>
                   <Button
                     sx={{ position: 'absolute', bottom: -10, left: 5, mt: 1 }}

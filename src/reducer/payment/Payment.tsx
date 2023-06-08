@@ -2,17 +2,15 @@
 import React from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import { Box, Stack, Typography } from '@mui/material';
-import ColorTabs from '@/components/ColorTabs';
+import ColorTabs from '@components/ColorTabs';
+import { throttle } from '@utils/utils';
 import { EStatusIBooking } from '@/utils/enum';
 import { RootState, useAppDispatch } from '@/app/store';
 import CardBooking from './CardBooking';
-
-import { throttle } from '@/utils/utils';
 import { fetchGetBookingsByHotelier } from './payment.slice';
 import { IHotel, IRoom } from '@/utils/interface';
 
 const tabs = [
-  { name: 'pending', statusPayment: EStatusIBooking.PENDING },
   { name: 'paid', statusPayment: EStatusIBooking.SUCCESS },
   { name: 'stayed', statusPayment: EStatusIBooking.STAY },
   { name: 'decline', statusPayment: EStatusIBooking.DECLINE },
@@ -100,6 +98,7 @@ function Payment({ targetHotel }: { targetHotel: IHotel<IRoom[]> | null }) {
       <Stack mt={3} flexDirection='row' columnGap={5} marginX='auto' width='80%'>
         <ColorTabs
           tabs={tabs}
+          numberBadge={[]}
           value={statusBooking}
           handleChange={handleChange}
           orientation='vertical'
@@ -114,7 +113,7 @@ function Payment({ targetHotel }: { targetHotel: IHotel<IRoom[]> | null }) {
             ))
           ) : (
             <Box>
-              <Typography>Not have booking</Typography>
+              <Typography>Not booking</Typography>
             </Box>
           )}
         </Stack>

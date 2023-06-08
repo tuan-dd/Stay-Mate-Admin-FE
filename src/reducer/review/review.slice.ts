@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { createSlice } from '@reduxjs/toolkit';
+
 import { createAppAsyncThunk } from '../user/user.slice';
 import apiService from '@/app/server';
 import { IResponse, IReview } from '@/utils/interface';
 import { EStatusRedux } from '@/utils/enum';
+import { createToast } from '@/utils/utils';
 
 export interface IReviewRedux {
   status: EStatusRedux;
+  count: number;
   reviews: IReview[];
   replies: IReview[];
   typeReview: 'reviewNoReply' | 'reviewHadReply';
@@ -20,6 +23,7 @@ const initialState: IReviewRedux = {
   reviews: [],
   replies: [],
   errorMessage: '',
+  count: 0,
   page: 1,
 };
 
@@ -56,17 +60,21 @@ export const reviewSlice = createSlice({
         state.reviews[index].isReply = true;
         state.reviews[index].reply = data;
       }
+      if (state.typeReview === 'reviewNoReply') {
+        state.count -= 1;
+      }
+      createToast('Create reply successfully', 'success');
     });
     builder.addCase(fetchGetReviewNoReview.fulfilled, (state, action) => {
       state.status = EStatusRedux.succeeded;
       const { page, data, typeReview } = action.payload;
       if (data) {
         if (page === 1) {
-          state.reviews = data;
+          state.reviews = data.reviews;
         }
-        if (page !== state.page) state.reviews = state.reviews.concat([...data]);
-
-        state.typeReview = typeReview as 'reviewNoReply';
+        if (page !== state.page) state.reviews = state.reviews.concat([...data.reviews]);
+        state.count = data.count;
+        state.typeReview = typeReview;
         state.page = page;
       }
     });
@@ -74,8 +82,8 @@ export const reviewSlice = createSlice({
       state.status = EStatusRedux.succeeded;
       const { page, data, typeReview } = action.payload;
       if (data) {
-        const replies = data.filter((value) => value.parent_slug);
-        const reviews = data.filter((value) => !value.parent_slug);
+        const replies = data.reviews.filter((value) => value.parent_slug);
+        const reviews = data.reviews.filter((value) => !value.parent_slug);
         const combine = reviews.map((review) => {
           const value = replies.find((reply) => reply.parent_slug === review.slug);
           review.reply = value;
@@ -85,8 +93,8 @@ export const reviewSlice = createSlice({
           state.reviews = combine;
         }
         if (page !== state.page) state.reviews = state.reviews.concat([...combine]);
-
-        state.typeReview = typeReview as 'reviewHadReply';
+        state.count = data.count;
+        state.typeReview = typeReview;
         state.page = page;
       }
     });
@@ -94,31 +102,37 @@ export const reviewSlice = createSlice({
     builder.addCase(fetchGetReplyHotelier.fulfilled, (state, action) => {
       state.status = EStatusRedux.succeeded;
       if (action.payload) {
-        state.replies = state.reviews.concat([...action.payload]);
+        state.replies = state.reviews.concat([...action.payload.reviews]);
       }
     });
 
-    builder.addCase(fetchUpdateReply.fulfilled, (state) => {
+    builder.addCase(fetchUpdateReply.fulfilled, (state, action) => {
       state.status = EStatusRedux.succeeded;
 
-      // const { context, index, starRating, isDelete } = action.payload;
+      const { context, index, starRating, isDelete } = action.payload;
+      const { reply } = state.reviews[index];
 
-      // if (isDelete) {
-      //   state.reviews[index].reply = undefined;
-      // }
-
-      // (state.reviews[index].reply as IReview).context = context;
-      // (state.reviews[index].reply as IReview).starRating = starRating;
+      if (isDelete) {
+        state.reviews[index].reply = undefined;
+        createToast('Delete reply successfully', 'warning');
+      }
+      if (reply) {
+        reply.context = context;
+        reply.starRating = starRating;
+        createToast('Update reply successfully', 'success');
+      }
     });
 
     builder.addCase(fetchCreateReply.rejected, (state, action) => {
       state.status = EStatusRedux.error;
       state.errorMessage = action.error.message || 'some thing wrong';
+      createToast('Can`t create reply', 'error');
     });
     builder.addCase(fetchGetReviewNoReview.rejected, (state, action) => {
       state.status = EStatusRedux.error;
       if (state.typeReview !== action.meta.arg.typeReview) {
         state.reviews = [];
+        state.count = 0;
       }
       state.typeReview = action.meta.arg.typeReview;
       state.errorMessage = action.error.message || 'some thing wrong';
@@ -127,6 +141,7 @@ export const reviewSlice = createSlice({
       state.status = EStatusRedux.error;
       if (state.typeReview !== action.meta.arg.typeReview) {
         state.reviews = [];
+        state.count = 0;
       }
       state.typeReview = action.meta.arg.typeReview;
       state.errorMessage = action.error.message || 'some thing wrong';
@@ -134,9 +149,15 @@ export const reviewSlice = createSlice({
     builder.addCase(fetchUpdateReply.rejected, (state, action) => {
       state.status = EStatusRedux.error;
       state.errorMessage = action.error.message || 'some thing wrong';
+      createToast('Can`t update reply', 'error');
     });
   },
 });
+
+interface IResReviews {
+  reviews: IReview[];
+  count: number;
+}
 
 export const fetchGetReviewNoReview = createAppAsyncThunk(
   'review/fetchGetReviewNoReview',
@@ -149,9 +170,10 @@ export const fetchGetReviewNoReview = createAppAsyncThunk(
     hotelId: string;
     typeReview: 'reviewNoReply';
   }) => {
-    const response = await apiService.get<IResponse<IReview[]>>('review/hotelier', {
+    const response = await apiService.get<IResponse<IResReviews>>('review/hotelier', {
       params: { typeReview, page, hotelId },
     });
+
     return { data: response.data.data, page, typeReview };
   }
 );
@@ -167,7 +189,7 @@ export const fetchGetReviewHadReview = createAppAsyncThunk(
     hotelId: string;
     typeReview: 'reviewHadReply';
   }) => {
-    const response = await apiService.get<IResponse<IReview[]>>('review/hotelier', {
+    const response = await apiService.get<IResponse<IResReviews>>('review/hotelier', {
       params: { typeReview, page, hotelId },
     });
     return { data: response.data.data, page, typeReview };
@@ -185,7 +207,7 @@ export const fetchGetReplyHotelier = createAppAsyncThunk(
     hotelId: string;
     typeReview?: 'reply';
   }) => {
-    const response = await apiService.get<IResponse<IReview[]>>('review/hotelier', {
+    const response = await apiService.get<IResponse<IResReviews>>('review/hotelier', {
       params: { typeReview, page, hotelId },
     });
     return response.data.data;

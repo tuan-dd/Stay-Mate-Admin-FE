@@ -94,6 +94,7 @@ export const authSlice = createSlice({
 
     builder.addCase(fetchLogin.rejected, (state, action) => {
       state.status = EStatusRedux.error;
+      state.isInitialState = true;
       state.errorMessage = action.error.message || 'some thing wrong';
     });
 

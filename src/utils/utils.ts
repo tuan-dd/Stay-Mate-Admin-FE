@@ -62,6 +62,9 @@ export function isValidStartDate(date: Date | string) {
   return numberDayNow - numberStartDate < 60 * 60 * 24;
 }
 
-export function createToast(content: string, type: 'success' | 'error' | 'warning') {
+export function createToast(
+  content: string,
+  type: 'success' | 'error' | 'warning' | 'info'
+) {
   return toast[type](content);
 }

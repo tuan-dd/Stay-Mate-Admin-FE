@@ -13,23 +13,6 @@ function AuthRequire({ children }: { children: React.ReactNode | React.ReactNode
   const user = useSelector((state: RootState) => state.user.currentUser);
   const location = useLocation();
   const dispatch = useAppDispatch();
-  React.useEffect(() => {
-    try {
-      const accessToken = decoded(Cookies.get('accessToken'));
-      const refreshToken = decoded(Cookies.get('refreshToken'));
-      if (accessToken && !user) {
-        dispatch(fetchUser());
-      } else if (refreshToken && !accessToken) {
-        dispatch(fetchNewAccessToken());
-      } else if (!refreshToken && !accessToken) {
-        dispatch(setIsInitialState());
-        setAllCookie(true);
-      }
-    } catch (error) {
-      setAllCookie(true);
-      dispatch(setIsInitialState());
-    }
-  }, []);
 
   React.useEffect(() => {
     try {
