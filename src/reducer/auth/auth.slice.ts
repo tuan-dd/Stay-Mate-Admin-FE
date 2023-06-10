@@ -144,7 +144,8 @@ export const fetch2FA = createAppAsyncThunk(
       {
         sixCode: code,
         email: state.auth.email,
-      }
+      },
+      { withCredentials: true }
     );
     const { data } = response.data;
     if (data !== null) {
