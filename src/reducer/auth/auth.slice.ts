@@ -4,7 +4,7 @@ import Cookie from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
 import jwtDecode from 'jwt-decode';
 import { IUser, IResponse, JwtPayloadUser } from '@/utils/interface';
-import { setAllCookie, setCookie, setHeaders, setKeyHeader } from '@/utils/jwt';
+import { setAllCookie, setHeaders, setKeyHeader } from '@/utils/jwt';
 import apiService from '@/app/server';
 import { EKeyHeader, EStatusRedux } from '@/utils/enum';
 import { createAppAsyncThunk, fetchUser, logOut, setUser } from '../user/user.slice';
@@ -149,13 +149,13 @@ export const fetch2FA = createAppAsyncThunk(
     );
     const { data } = response.data;
     if (data !== null) {
-      // setAllCookie(false, {
-      //   userId: data._id,
-      //   accessToken: data.accessToken,
-      //   refreshToken: data.refreshToken,
-      // });
+      setAllCookie(false, {
+        userId: data._id,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      });
 
-      setCookie('userId', data._id);
+      // setCookie('userId', data._id);
       setHeaders();
       dispatch(setUser(data));
     }
