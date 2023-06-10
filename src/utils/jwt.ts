@@ -73,4 +73,16 @@ const setAllCookie = (
   }
 };
 
-export { decoded, setKeyHeader, setHeaders, setAllCookie };
+const setCookie = (name: string, value: string) => {
+  const option: CookieAttributes = {
+    httpOnly: false,
+    secure: false,
+    path: '/',
+    sameSite: 'strict',
+    expires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7),
+  };
+
+  Cookie.set(name, value, option);
+};
+
+export { decoded, setKeyHeader, setHeaders, setAllCookie, setCookie };

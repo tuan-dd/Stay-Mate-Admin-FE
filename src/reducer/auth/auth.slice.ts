@@ -4,7 +4,7 @@ import Cookie from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
 import jwtDecode from 'jwt-decode';
 import { IUser, IResponse, JwtPayloadUser } from '@/utils/interface';
-import { setAllCookie, setHeaders, setKeyHeader } from '@/utils/jwt';
+import { setAllCookie, setCookie, setHeaders, setKeyHeader } from '@/utils/jwt';
 import apiService from '@/app/server';
 import { EKeyHeader, EStatusRedux } from '@/utils/enum';
 import { createAppAsyncThunk, fetchUser, logOut, setUser } from '../user/user.slice';
@@ -78,11 +78,12 @@ export const authSlice = createSlice({
 
     builder.addCase(fetch2FA.fulfilled, (state) => {
       state.status = EStatusRedux.succeeded;
-
+      state.isInitialState = true;
       state.is2FA = true;
     });
 
     builder.addCase(fetchNewAccessToken.fulfilled, (state) => {
+      state.isInitialState = true;
       state.status = EStatusRedux.succeeded;
     });
 
@@ -147,13 +148,13 @@ export const fetch2FA = createAppAsyncThunk(
     );
     const { data } = response.data;
     if (data !== null) {
-      setAllCookie(false, {
-        userId: data._id,
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-      });
+      // setAllCookie(false, {
+      //   userId: data._id,
+      //   accessToken: data.accessToken,
+      //   refreshToken: data.refreshToken,
+      // });
 
-      // console.log('accessToken', accessToken);
+      setCookie('userId', data._id);
       setHeaders();
       dispatch(setUser(data));
     }

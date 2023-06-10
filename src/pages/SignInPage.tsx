@@ -94,7 +94,7 @@ export default function SignInPage() {
                 sx={{ textDecoration: 'underline' }}
                 variant='caption'
                 component={Button}
-                onClick={() => {}}
+                onClick={() => navigate('/signup')}
               >
                 Get started
               </Typography>

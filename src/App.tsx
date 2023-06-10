@@ -25,7 +25,7 @@ const router = createBrowserRouter([
     element: <BlankLayout />,
     children: [
       { path: 'login', element: <SignInPage /> },
-      { path: 'signUp', element: <SignUpPage /> },
+      { path: 'signup', element: <SignUpPage /> },
     ],
   },
 ]);

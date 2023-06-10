@@ -27,6 +27,7 @@ interface IUserRedux {
   myHotels: IHotel<IRoom[]>[] | null;
   role: ERole | string;
   errorMessage: string;
+  errorCreateUser: string;
 }
 
 const initialState: IUserRedux = {
@@ -35,6 +36,7 @@ const initialState: IUserRedux = {
   myHotels: null,
   role: '',
   errorMessage: '',
+  errorCreateUser: '',
 };
 
 export const userSlice = createSlice({
@@ -69,6 +71,7 @@ export const userSlice = createSlice({
     });
     builder.addCase(fetchCreateUser.pending, (state) => {
       state.status = EStatusRedux.pending;
+      state.errorCreateUser = '';
       state.errorMessage = '';
     });
     builder.addCase(fetchUpdateUser.pending, (state) => {
@@ -99,11 +102,11 @@ export const userSlice = createSlice({
 
     builder.addCase(fetchUser.rejected, (state, action) => {
       state.status = EStatusRedux.error;
-      state.errorMessage = action.error.message || 'some thing wrong';
+      state.errorMessage = action.payload || 'some thing wrong';
     });
     builder.addCase(fetchCreateUser.rejected, (state, action) => {
       state.status = EStatusRedux.error;
-      state.errorMessage = action.error.message || 'some thing wrong';
+      state.errorCreateUser = action.error.message || 'some thing wrong';
     });
     builder.addCase(fetchUpdateUser.rejected, (state, action) => {
       state.status = EStatusRedux.error;

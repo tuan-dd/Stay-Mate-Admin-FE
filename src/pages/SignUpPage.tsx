@@ -47,7 +47,7 @@ const signUpInput = z
 
 export default function SignUpPage() {
   const [isShowPw, setIsShowPw] = React.useState<boolean>(false);
-  const { errorMessage, status, currentUser } = useSelector(
+  const { errorCreateUser, status, currentUser } = useSelector(
     (state: RootState) => state.user
   );
   const { isSignIn } = useSelector((state: RootState) => state.auth);
@@ -87,7 +87,7 @@ export default function SignUpPage() {
           >
             Stay Mate
           </Typography>
-          {errorMessage && <Alert severity='warning'>{errorMessage}</Alert>}
+          {errorCreateUser && <Alert severity='warning'>{errorCreateUser}</Alert>}
         </Stack>
         <FormProvider onSubmit={onSubmit} {...methods}>
           <Stack gap={2}>
