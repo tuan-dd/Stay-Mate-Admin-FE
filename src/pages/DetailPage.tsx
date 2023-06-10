@@ -11,7 +11,10 @@ import ColorTabs from '@components/ColorTabs';
 import { RootState, useAppDispatch } from '@app/store';
 import { fetchGetHotels, setTarget } from '@reducer/hotel/hotel.slice';
 import Review from '@reducer/review/Review';
-import { fetchGetBookingsByHotelier } from '@/reducer/payment/payment.slice';
+import {
+  fetchCountBookingAtHotel,
+  fetchGetBookingsByHotelier,
+} from '@/reducer/payment/payment.slice';
 import { EStatusIBooking } from '@/utils/enum';
 import { fetchGetReviewNoReview } from '@/reducer/review/review.slice';
 
@@ -49,27 +52,24 @@ function DetailPage() {
     shallowEqual
   );
 
-  const { statusPayment, count } = useSelector(
-    (state: RootState) => ({
-      bookings: state.payment.bookings,
-      statusPayment: state.payment.statusPayment,
-      count: state.payment.count,
-    }),
+  const countBookingSuccess = useSelector(
+    (state: RootState) => state.payment.countBookingSuccess,
+
     shallowEqual
   );
   const [searchParams] = useSearchParams();
   const dispatch = useAppDispatch();
   const index = Number(searchParams.get('index'));
-  const bookingId = searchParams.get('bookingId');
+  const hotelId = searchParams.get('hotelId');
 
   React.useEffect(() => {
-    if (!Number.isNaN(index) && bookingId && !myHotels.length) {
+    if (!Number.isNaN(index) && hotelId && !myHotels.length) {
       if (is2FA) dispatch(fetchGetHotels());
     }
-  }, [index, bookingId, myHotels]);
+  }, [index, hotelId, myHotels]);
 
   React.useEffect(() => {
-    if (!Number.isNaN(index) && bookingId && myHotels.length > 0) {
+    if (!Number.isNaN(index) && hotelId && myHotels.length > 0) {
       if (!targetHotel && index < myHotels.length) {
         dispatch(setTarget(index));
         dispatch(
@@ -117,21 +117,31 @@ function DetailPage() {
         );
       }
     }
-  }, [index, bookingId, myHotels.length]);
+  }, [index, hotelId, myHotels.length]);
 
   const numberBookingSuccessRef = React.useRef<number>(0);
   const numberReviewNoReplyRef = React.useRef<number>(0);
 
-  if (
-    statusPayment === EStatusIBooking.SUCCESS &&
-    count !== numberBookingSuccessRef.current
-  ) {
-    numberBookingSuccessRef.current = count;
-  }
-
   if (typeReview === 'reviewNoReply' && countReview !== numberReviewNoReplyRef.current) {
     numberReviewNoReplyRef.current = countReview;
   }
+
+  if (numberBookingSuccessRef.current !== countBookingSuccess) {
+    numberBookingSuccessRef.current = countBookingSuccess;
+  }
+
+  React.useEffect(() => {
+    let alertInterval: null | NodeJS.Timeout = null;
+    if (hotelId && !alertInterval) {
+      alertInterval = setInterval(
+        () => dispatch(fetchCountBookingAtHotel(hotelId)),
+        8000
+      );
+    }
+    return () => {
+      if (alertInterval) clearInterval(alertInterval);
+    };
+  }, []);
 
   return (
     <Container maxWidth={false} disableGutters>

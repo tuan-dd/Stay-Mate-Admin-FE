@@ -96,7 +96,7 @@ function CardHotel({ hotel, index }: { hotel: IHotel<IRoom[]>; index: number }) 
             sx={{ flexGrow: 1 }}
             onClick={() => {
               dispatch(setTarget(index));
-              navigate(`/detail?bookingId=${hotel._id}&index=${index}`);
+              navigate(`/detail?hotelId=${hotel._id}&index=${index}`);
             }}
           >
             <Stack spacing={1} mt={1}>
@@ -111,7 +111,7 @@ function CardHotel({ hotel, index }: { hotel: IHotel<IRoom[]>; index: number }) 
             sx={{ minWidth: 230 }}
             onClick={() => {
               dispatch(setTarget(index));
-              navigate(`/detail?bookingId=${hotel._id}&index=${index}`);
+              navigate(`/detail?hotelId=${hotel._id}&index=${index}`);
             }}
           >
             <Stack justifyContent='space-around' alignItems='center' height='100%'>

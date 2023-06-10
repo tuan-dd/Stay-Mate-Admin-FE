@@ -18,14 +18,14 @@ function FTextField({ name, typeInput, min, max, ...other }: PropsForm & TextFie
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             if (typeInput === 'number') {
               const value = Number(event.target.value);
-
+              if (!event.target.value) {
+                return field.onChange('');
+              }
               if (typeof max === 'number' && value > max)
                 return field.onChange(field.value);
 
               if (typeof min === 'number' && value < min)
                 return field.onChange(field.value);
-
-              if (!value && value !== 0) return field.onChange('');
 
               return field.onChange(value);
             }

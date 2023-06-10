@@ -19,6 +19,8 @@ export interface IPaymentRedux {
   errorMessage: string;
   errorMessageChargeOrWithdraw: string;
   count: number;
+  countAll: number;
+  countBookingSuccess: number;
   page: number;
 }
 
@@ -30,6 +32,8 @@ const initialState: IPaymentRedux = {
   errorMessage: '',
   errorMessageChargeOrWithdraw: '',
   count: 0,
+  countAll: 0,
+  countBookingSuccess: 0,
   page: 1,
 };
 
@@ -64,6 +68,14 @@ export const paymentSlice = createSlice({
       state.status = EStatusRedux.pending;
       state.errorMessage = '';
     });
+    builder.addCase(fetchCountBookingAtHotel.pending, (state) => {
+      state.status = EStatusRedux.pending;
+      state.errorMessage = '';
+    });
+    builder.addCase(fetchCountBookingAll.pending, (state) => {
+      state.status = EStatusRedux.pending;
+      state.errorMessage = '';
+    });
 
     builder.addCase(fetchCharge.fulfilled, (state) => {
       state.status = EStatusRedux.succeeded;
@@ -81,9 +93,31 @@ export const paymentSlice = createSlice({
         } else {
           state.bookings = [...state.bookings, ...action.payload.data.bookings];
         }
+        if (action.payload.data.bookings[0].status === EStatusIBooking.SUCCESS) {
+          state.countBookingSuccess = action.payload.data.count;
+        }
         state.count = action.payload.data.count;
         state.page = action.payload.page;
         state.statusPayment = action.payload.data.bookings[0].status as EStatusIBooking;
+      }
+    });
+    builder.addCase(fetchCountBookingAtHotel.fulfilled, (state, action) => {
+      state.status = EStatusRedux.succeeded;
+      if (action.payload) {
+        if (action.payload.count > state.countBookingSuccess) {
+          createToast('You have new booking', 'success');
+        }
+
+        if (action.payload.count < state.countBookingSuccess) {
+          createToast('You have new decline booking', 'info');
+        }
+        state.countBookingSuccess = action.payload.count;
+      }
+    });
+    builder.addCase(fetchCountBookingAll.fulfilled, (state, action) => {
+      state.status = EStatusRedux.succeeded;
+      if (action.payload) {
+        state.countAll = action.payload.count;
       }
     });
 
@@ -103,6 +137,15 @@ export const paymentSlice = createSlice({
         state.count = 0;
       }
       state.statusPayment = action.meta.arg.status;
+      state.errorMessage = action.error.message || 'some thing wrong';
+    });
+
+    builder.addCase(fetchCountBookingAtHotel.rejected, (state, action) => {
+      state.status = EStatusRedux.error;
+      state.errorMessage = action.error.message || 'some thing wrong';
+    });
+    builder.addCase(fetchCountBookingAll.rejected, (state, action) => {
+      state.status = EStatusRedux.error;
       state.errorMessage = action.error.message || 'some thing wrong';
     });
   },
@@ -168,6 +211,37 @@ export const fetchWithdraw = createAppAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
+  }
+);
+
+interface ICountBookings {
+  count: number;
+}
+
+export const fetchCountBookingAtHotel = createAppAsyncThunk(
+  'payment/fetchCountBookingAtHotel',
+  async (hotelId: string) => {
+    const response = await apiService.get<IResponse<ICountBookings>>(
+      '/payment/hotelier/count',
+      {
+        params: { allHotel: false, hotelId },
+      }
+    );
+    return response.data.data;
+  }
+);
+
+export const fetchCountBookingAll = createAppAsyncThunk(
+  'payment/fetchCountBookingAll',
+  async (hotelId: string) => {
+    const response = await apiService.get<IResponse<ICountBookings>>(
+      '/payment/hotelier/count',
+      {
+        params: { allHotel: true, hotelId },
+      }
+    );
+
+    return response.data.data;
   }
 );
 

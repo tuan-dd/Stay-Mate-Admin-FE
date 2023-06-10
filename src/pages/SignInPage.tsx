@@ -74,9 +74,15 @@ export default function SignInPage() {
   }, [is2FA]);
 
   return (
-    <>
+    <Stack
+      alignItems='center'
+      minHeight='100vh'
+      height='100vh'
+      width='100%'
+      justifyContent='center'
+    >
       {!isShowFormCode ? (
-        <Box>
+        <Box width='60%'>
           <Stack gap={1} mb={2}>
             <Typography
               variant='h4'
@@ -145,7 +151,7 @@ export default function SignInPage() {
           setIsShowFormCode={setIsShowFormCode}
         />
       )}
-    </>
+    </Stack>
   );
 }
 

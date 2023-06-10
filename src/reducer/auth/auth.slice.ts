@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import Cookie from 'js-cookie';
-import cloneDeep from 'lodash/cloneDeep';
 import jwtDecode from 'jwt-decode';
 import { IUser, IResponse, JwtPayloadUser } from '@/utils/interface';
 import { setAllCookie, setHeaders, setKeyHeader } from '@/utils/jwt';
@@ -87,7 +86,8 @@ export const authSlice = createSlice({
     });
 
     builder.addCase(fetchSignOut.fulfilled, (state) => {
-      state = cloneDeep(initialState);
+      state = { ...initialState };
+      state.status = EStatusRedux.succeeded;
       state.isInitialState = true;
       return state;
     });
@@ -106,6 +106,7 @@ export const authSlice = createSlice({
 
     builder.addCase(fetchNewAccessToken.rejected, (state, action) => {
       state.status = EStatusRedux.error;
+      state.isInitialState = true;
       state.errorMessage = action.error.message || 'some thing wrong';
     });
 
@@ -134,7 +135,7 @@ interface IResponseFetch2FA extends IUser {
 }
 
 export const fetch2FA = createAppAsyncThunk(
-  'auth/fetchCode',
+  'auth/fetch2FA',
   async (code: number | string, { getState, dispatch }) => {
     const state = getState();
     // console.log(code);

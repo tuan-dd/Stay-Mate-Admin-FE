@@ -154,7 +154,7 @@ export default function Rooms({ dateHotel }: { dateHotel: IHotel<IRoom[]> }) {
               </Button>
             </Stack>
             <Divider orientation='vertical' flexItem />
-            <Stack minWidth={150} spacing={0.5}>
+            <Stack width={200} spacing={0.5}>
               <Typography variant='h6' color='primary.main'>
                 Amenities
               </Typography>
@@ -197,7 +197,7 @@ export default function Rooms({ dateHotel }: { dateHotel: IHotel<IRoom[]> }) {
             <Divider orientation='vertical' flexItem />
             <CardContent
               sx={{
-                flexGrow: '1',
+                flexGrow: 1,
                 p: 0,
                 display: 'flex',
                 flexDirection: 'column',
