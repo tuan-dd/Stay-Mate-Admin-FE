@@ -124,7 +124,7 @@ function CardHotel({ hotel, index }: { hotel: IHotel<IRoom[]>; index: number }) 
                     fontWeight='600'
                     color='success.light'
                   >
-                    {(hotel.starRating.starAverage / 5) * 10}
+                    {Math.ceil((hotel.starRating.starAverage / 5) * 10)}
                   </Typography>
                 </Typography>
                 {hotel.starRating.countReview > 0 ? (
